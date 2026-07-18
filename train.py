@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"Using device: {device}")
 with open('shakespeare.txt', 'r', encoding='utf-8') as f:
     text = f.read()
 chars = sorted(list(set(text)))
@@ -26,9 +28,11 @@ torch.manual_seed(1337)
 def get_batch(split):
     data = train_data if split == 'train' else val_data
     ix = torch.randint(len(data) - block_size, (batch_size,))
-    ax = torch.stack([data[i:i+block_size] for i in ix])
-    y = torch.stack([data[i+1:i+block_size+1] for i in ix])
-    return ax, y
+    x = torch.stack([data[i:i + block_size] for i in ix])
+    y = torch.stack([data[i + 1:i + block_size + 1] for i in ix])
+    x = x.to(device)
+    y = y.to(device)
+    return x, y
 xb, yb = get_batch('train')
 for b in range(batch_size):
     for t in range(block_size):
@@ -129,7 +133,7 @@ class LanguageModel(nn.Module):
             idx_next = torch.multinomial(probs, num_samples=1)
             idx = torch.cat((idx, idx_next), dim=1)
         return idx
-m = LanguageModel()
+m = LanguageModel().to(device)
 logits, loss = m(xb, yb)
 optimizer = torch.optim.AdamW(m.parameters(), learning_rate)
 for steps in range(max_iters):
@@ -141,4 +145,6 @@ for steps in range(max_iters):
     if steps % eval_iters == 0:
         print(f"step {steps}: loss {loss.item():.4f}")
 print(loss.item())
-print(decode(m.generate(torch.zeros((1, 1), dtype=torch.long), max_new_tokens=500)[0].tolist()))
+print(decode(m.generate(torch.zeros((1, 1), dtype = torch.long, device = device), max_new_tokens=500)[0].tolist()))
+torch.save(m.state_dict(), "gpt.pt")
+print("Model saved as gpt.pt")
