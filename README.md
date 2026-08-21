@@ -39,14 +39,8 @@ The architecture is heavily inspired by Andrej Karpathy's educational NanoGPT se
 ## Requirements
 
 - Python 3.10+
-- uv
+- nix
 - NVIDIA GPU (optional, but recommended)
-
-If you don't already have **uv** installed:
-
-```bash
-pip install uv
-```
 
 ---
 
@@ -59,16 +53,16 @@ git clone <repository-url>
 cd gpt
 ```
 
-Install all dependencies:
+Enter the dev shell using flake.nix:
 
 ```bash
-uv sync
+nix develop
 ```
 
 Train the model:
 
 ```bash
-uv run gpt.py
+python main.py
 ```
 
 The script will:
@@ -99,7 +93,6 @@ Some examples include:
 - Documentation
 - Your own writing
 
-A sample `feynman.txt` dataset is also included.
 
 ---
 
