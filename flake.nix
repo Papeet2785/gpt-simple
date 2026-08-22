@@ -1,10 +1,8 @@
 {
   description = "Python + PyTorch development environment";
-
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs?ref=nixos-unstable";
   };
-
   outputs = { self, nixpkgs }:
     let
       system = "x86_64-linux";
